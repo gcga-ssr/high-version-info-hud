@@ -1,0 +1,36 @@
+// Points every NeoForge Maven repository at the local caching proxy.
+//
+// On this machine the JVM's TLS stack cannot complete a handshake with
+// maven.neoforged.net (CDN77 resets the connection), so Gradle, the NeoForm
+// Runtime and every other JVM tool fail to download from it. nf_proxy.py
+// fetches those artifacts with Python/OpenSSL and serves them over plain HTTP
+// on localhost, so nothing else has to change.
+
+def PROXY = 'http://127.0.0.1:8123'
+def UPSTREAM = 'maven.neoforged.net'
+
+def redirect = { repo ->
+    if (repo instanceof org.gradle.api.artifacts.repositories.MavenArtifactRepository) {
+        def u = repo.url?.toString()
+        if (u != null && u.contains(UPSTREAM)) {
+            def replaced = u.replace('https://' + UPSTREAM, PROXY) \
+                            .replace('http://' + UPSTREAM, PROXY)
+            repo.setUrl(replaced)
+            println "[nf-proxy] ${u} -> ${replaced}"
+        }
+    }
+}
+
+settingsEvaluated { settings ->
+    try {
+        def repos = settings.dependencyResolutionManagement.repositories
+        repos.all(redirect)
+        repos.whenObjectAdded(redirect)
+    } catch (Throwable ignored) {
+    }
+}
+
+allprojects { p ->
+    p.repositories.all(redirect)
+    p.repositories.whenObjectAdded(redirect)
+}
