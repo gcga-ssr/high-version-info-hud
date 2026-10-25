@@ -30,6 +30,7 @@ public class BlockInfo {
 
         // 客户端部分只在客户端初始化。JVM 到这一行才会去解析 ClientBootstrap，
         // 所以专用服务器不会加载 Minecraft 的客户端类（Minecraft / GuiGraphicsExtractor 等）。
+        // 所以专用服务器不会加载 Minecraft 的客户端类（Minecraft / GuiGraphics 等）。
         if (com.example.blockinfo.compat.SideCompat.isClient()) {
             com.example.blockinfo.client.ClientBootstrap.init();
         }
