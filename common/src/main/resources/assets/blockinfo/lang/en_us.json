@@ -1,0 +1,9 @@
+{
+  "blockinfo.hud.input": "Input: %s x%s",
+  "blockinfo.hud.fuel": "Fuel: %s x%s",
+  "blockinfo.hud.output": "Output: %s x%s",
+  "blockinfo.hud.contents": "Contents:",
+  "blockinfo.hud.cooking": "Smelting:",
+  "blockinfo.hud.burning": "Burning:",
+  "blockinfo.hud.mining": "Mining:"
+}

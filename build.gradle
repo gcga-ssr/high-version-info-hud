@@ -1,95 +1,86 @@
 plugins {
-    id 'java-library'
-    id 'maven-publish'
-    id 'net.neoforged.moddev' version '[2.0,)'
+    // 插件只在根工程声明一次，各子工程用 apply plugin 复用。
+    id 'net.neoforged.moddev' version '[2.0,)' apply false
 }
 
-tasks.named('wrapper', Wrapper).configure {
-    distributionType = Wrapper.DistributionType.BIN
-}
+subprojects { sub ->
+    apply plugin: 'java-library'
+    apply plugin: 'net.neoforged.moddev'
 
-version = mod_version
-group = mod_group_id
+    // 版本号已经写进文件名（模组名-版本号-MC版本），所以 project.version 留空，
+    // 最终产物是 blockinfo-1.1.0-26.3.jar 这样的形式。
+    version = ''
+    group = rootProject.mod_group_id
 
-sourceSets.main.resources {
-    srcDir('src/generated/resources')
-}
-
-repositories {
-    mavenCentral()
-    maven { name = 'NeoForge'; url = 'https://maven.neoforged.net/releases' }
-    maven { name = 'Mojang'; url = 'https://libraries.minecraft.net' }
-}
-
-base {
-    archivesName = mod_id
-}
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-
-neoForge {
-    version = project.neo_version
-
-    // 不使用 Parchment：参数名对编译产物没有影响，少一个版本敏感的依赖。
-    runs {
-        client {
-            client()
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        }
-        server {
-            server()
-            programArgument '--nogui'
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        }
-    }
-
-    mods {
-        "${mod_id}" {
-            sourceSet(sourceSets.main)
-        }
-    }
-}
-
-configurations {
-    runtimeClasspath.extendsFrom localRuntime
-}
-
-dependencies {
-}
-
-var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
-    var replaceProperties = [
-            minecraft_version      : minecraft_version,
-            minecraft_version_range: minecraft_version_range,
-            neo_version            : neo_version,
-            neo_version_range      : neo_version_range,
-            loader_version_range   : loader_version_range,
-            mod_id                 : mod_id,
-            mod_name               : mod_name,
-            mod_license            : mod_license,
-            mod_version            : mod_version,
-    ]
-    inputs.properties replaceProperties
-    expand replaceProperties
-    from 'src/main/templates'
-    into 'build/generated/sources/modMetadata'
-}
-sourceSets.main.resources.srcDir generateModMetadata
-neoForge.ideSyncTask generateModMetadata
-
-publishing {
-    publications {
-        register('mavenJava', MavenPublication) {
-            from components.java
-        }
-    }
     repositories {
-        maven {
-            url "file://${project.projectDir}/repo"
+        mavenCentral()
+        maven { name = 'NeoForge'; url = 'https://maven.neoforged.net/releases' }
+        maven { name = 'Mojang'; url = 'https://libraries.minecraft.net' }
+    }
+
+    base {
+        archivesName = "${rootProject.mod_id}-${rootProject.mod_version}-${sub.minecraft_version}"
+    }
+
+    // 每个版本线要求的 Java 版本不同：1.21.x 用 21，26.x 起需要 25。
+    // 具体值写在 versions/<mc>/gradle.properties 的 java_version 里。
+    java.toolchain.languageVersion = JavaLanguageVersion.of((sub.findProperty('java_version') ?: '21') as int)
+
+    // 两条源码线：
+    //   1.21 -> common/src/main/java    （NeoForge 21.x 时代 API）
+    //   26   -> common26/src/main/java  （26.x 改名后的 API：Identifier / GuiGraphicsExtractor ...）
+    // 语言文件等资源两条线共用，放在 common/src/main/resources。
+    def sourceLine = (sub.findProperty('source_line') ?: '1.21').toString()
+    def javaRoot = sourceLine == '26' ? 'common26' : 'common'
+    sourceSets.main.java.srcDir rootProject.file("${javaRoot}/src/main/java")
+    sourceSets.main.resources.srcDir rootProject.file('common/src/main/resources')
+
+    neoForge {
+        version = sub.neo_version
+
+        // 不使用 Parchment：每个 MC 版本要各自的 mappings 版本号，只是多一个脆弱点，
+        // 参数名对编译产物没有影响。
+
+        runs {
+            client {
+                client()
+                systemProperty 'neoforge.enabledGameTestNamespaces', rootProject.mod_id
+            }
+            server {
+                server()
+                programArgument '--nogui'
+                systemProperty 'neoforge.enabledGameTestNamespaces', rootProject.mod_id
+            }
+        }
+
+        mods {
+            "${rootProject.mod_id}" {
+                sourceSet(sourceSets.main)
+            }
         }
     }
-}
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
+    def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+        def replaceProperties = [
+                minecraft_version      : sub.minecraft_version,
+                minecraft_version_range: sub.minecraft_version_range,
+                neo_version            : sub.neo_version,
+                neo_version_range      : sub.neo_version_range,
+                loader_version_range   : rootProject.loader_version_range,
+                mod_id                 : rootProject.mod_id,
+                mod_name               : rootProject.mod_name,
+                mod_license            : rootProject.mod_license,
+                mod_version            : rootProject.mod_version,
+        ]
+        inputs.properties replaceProperties
+        expand replaceProperties
+        from rootProject.file('common/src/main/templates')
+        into layout.buildDirectory.dir('generated/sources/modMetadata')
+    }
+    sourceSets.main.resources.srcDir generateModMetadata
+    sub.neoForge.ideSyncTask generateModMetadata
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
 }

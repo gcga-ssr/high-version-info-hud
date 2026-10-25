@@ -28,7 +28,13 @@ crash-reports/
 .buildtools/local-repo/
 .buildtools/api-probe/
 .buildtools/*.log
+.buildtools/logs/
 .buildtools/*.zip
+.buildtools/build-results.txt
+
+# ---- 多版本构建产物 ----
+versions/*/build/
+versions/*/.gradle/
 
 # ---- 其他 ----
 *.hprof
