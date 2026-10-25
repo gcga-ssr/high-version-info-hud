@@ -1,23 +1,40 @@
 # High Version Info HUD
 
-把准星指到方块上，屏幕顶部就会弹出它的信息面板：名字、来自哪个模组、能不能挖、
-作物长到几成、箱子/背包里装了什么、熔炉烧到哪一步、以及你正在挖掘的进度。
+把准星指到方块上，屏幕顶部立刻弹出它的信息面板 —— 不用打开背包，也不用按任何快捷键。
 
-客户端和服务端是**同一个 jar**：只装客户端就有完整的 HUD；装到服务端则额外同步熔炉与
-容器的精确数据；单人游戏装这一个文件就够。两个网络通道都是 **optional**，
-所以没装本模组的服务器照样进得去，装了本模组的服务器也照样接受原版客户端。
+这个模组最初是为了解决 **NeoForge 上准星信息显示缺失**的问题而写的：高版本 NeoForge 一直
+没有一个能在世界里直接"看着方块看内容"的预览工具。现在它还额外解决了老版本信息类模组在
+NeoForge 上不工作的问题。
 
-> **关于名字**：模组 ID 一直沿用 `blockinfo`（早期叫 Block Info），仓库改名为
-> High Version Info HUD 后 ID 未变，以免已有的存档/整合包失效。详见
-> [`blockinfo-was-the-former-name-of-high-version-info-hud.txt`](blockinfo-was-the-former-name-of-high-version-info-hud.txt)。
+> 模组 ID 一直沿用 `blockinfo`（创建时的名字），仓库和发布页改名为 High Version Info HUD
+> 后 ID 未变，以免已有的存档与整合包失效。看到源码里的 `blockinfo` 不用困惑。
+
+---
+
+## 为什么用它
+
+现存的容器预览模组大多只支持**背包里的容器物品**，而且必须**按住快捷键**才能弹出预览。
+
+这个 HUD 的做法不一样：只要把准星对准世界里的方块，完整的方块信息与容器内容就直接显示在
+屏幕上方 —— 不需要打开任何界面，不需要额外按键。它补上了高版本 NeoForge 上
+「准星预览」这个长期空缺。
+
+对比：
+
+| | 常见容器预览模组 | High Version Info HUD |
+| --- | --- | --- |
+| 触发方式 | 按住快捷键 | 准星对准即可 |
+| 作用对象 | 背包里的容器物品 | 世界里的方块实体 |
+| 是否需要开界面 | 是 | 否 |
+| 显示内容 | 物品列表 | 方块名、所属模组、可否挖掘、作物生长、容器内容、熔炉状态、挖掘进度 |
 
 ## 功能
 
 * **方块信息** —— 本地化名称、所属模组 ID、是否原版方块
-* **能否挖掘** —— 右下角 ✓ / ✗ 标记，取决于手上的工具
+* **能否挖掘** —— ✓ / ✗ 标记，取决于手上的工具
 * **作物生长** —— 识别 `age` / `stage` / `growth` / `level` / `height` 等整数属性
 * **容器内容** —— 箱子、木桶、潜影盒等按物品聚合并分列显示
-* **熔炉状态** —— 输入 / 燃料 / 输出，以及烧制与燃烧两条进度
+* **熔炉状态** —— 输入 / 燃料 / 输出，以及烧制与燃烧两条实时进度
 * **挖掘进度** —— 实时显示当前方块的破坏百分比
 * **多语言** —— 简体中文 / English 内置，可自行扩展
 
@@ -69,15 +86,12 @@ HUD 文案走原版语言文件：
 2. 把对应版本的 jar 放进 `mods/`；
 3. 客户端放客户端，服务端放服务端 —— 是同一个文件，不需要两个包。
 
+**服务端装不装都可以**（这一点和早期版本不同）：网络通道已改为 optional，
+只装客户端也能进任何服务器，方块名、所属模组、可否挖掘、作物生长、挖掘进度、容器内容照常显示；
+把同一个 jar 也装到服务端，才会额外同步熔炉的精确烧制/燃烧进度。
+
 > ⚠️ 所有版本的 `modId` 都是 `blockinfo`，**同一个 `mods/` 目录里只能放一个**，
 > 否则 FML 会报 `Duplicate mod`。
-
-## 兼容性
-
-* **客户端装、服务端不装**：正常，HUD 的方块名、所属模组、可否挖掘、作物生长、挖掘进度、
-  容器内容都走客户端本地读取，照常显示；熔炉的精确进度需要服务端同步。
-* **服务端装、客户端不装**：正常，原版客户端不会被踢。
-* **单人游戏**：只装一个 jar 就完整工作，集成服务器同样会加载同步逻辑。
 
 ## 构建
 
@@ -102,16 +116,18 @@ HUD 文案走原版语言文件：
 ## 目录结构
 
 ```
-common/src/main/java/          1.21.x 版本线的源码（NeoForge 21.x API）
-common26/src/main/java/        26.x 版本线的源码（改名后的 API）
-common/src/main/resources/     两条线共用资源：语言文件
+common/src/main/java/          1.21.1 ~ 1.21.10 的源码
+common111/src/main/java/       1.21.11 的源码（ResourceLocation 已改名 Identifier）
+common26/src/main/java/        26.x 的源码（Identifier + GuiGraphicsExtractor）
+common/src/main/resources/     三条线共用资源：语言文件
 common/src/main/templates/     neoforge.mods.toml 模板
 versions/<MC版本>/             每个版本一行配置
 build.gradle                   子工程公共构建配置
 settings.gradle                版本列表
 ```
 
-`common` 与 `common26` 的区别只在 26.x 的几处改名（见下），其余逻辑完全一致。
+三份源码只有下表那几处改名的差异，其余逻辑完全一致。
+源码就是全部内容 —— 想改、想重编译都可以直接拿去用。
 
 ## 实现要点
 
@@ -136,10 +152,38 @@ settings.gradle                版本列表
 | --- | --- | --- |
 | `BuiltInRegistries.ITEM.get(id)` 返回 `Optional<Reference<Item>>` | 1.21.2 | 改为遍历注册表 + `getKey` |
 | `ServerPlayer.serverLevel()` → `level()` | 1.21.6 | 统一写 `(ServerLevel) player.level()` |
-| `ResourceLocation` → `Identifier` | 26.x | `common26` 分支 |
+| `FMLEnvironment.dist` 字段 → `getDist()` 方法 | 1.21.9 | 反射探测（`compat/SideCompat`），两条线通用 |
+| `ResourceLocation` → `Identifier`，`ResourceKey.location()` → `identifier()` | 1.21.11 | `common111` 分支 |
 | `GuiGraphics` → `GuiGraphicsExtractor`，`drawString` → `text` | 26.x | `common26` 分支 |
-| `FMLEnvironment.dist` 字段 → `getDist()` 方法 | 26.x | `common26` 分支 |
 
 ## 许可证
 
-MIT，见 [LICENSE](LICENSE)。
+Apache License 2.0，见 [LICENSE](LICENSE)。
+
+---
+
+## English
+
+**High Version Info HUD** shows a live info panel at the top of the screen for whatever block
+your crosshair is on. It was originally written to fix the missing crosshair info display on
+NeoForge.
+
+Unlike most container-preview mods, which only work on container *items* in your inventory and
+require holding a hotkey, this HUD instantly shows full block and container details just by
+aiming your crosshair at blocks in the world — no inventory screen, no extra key presses.
+
+It shows the block name and source mod, whether your current tool can harvest it, crop growth,
+container contents, furnace smelting/burning progress, and block breaking progress.
+
+**Versions**: one jar per Minecraft release from `1.21.1` through `26.3` (16 releases; Mojang
+switched to `year.release` numbering in 2026). Each jar is compiled against the *lowest*
+NeoForge release of its line, so it loads across that whole line. Build with JDK 21
+(JDK 25 for the 26.x line):
+
+```bash
+./gradlew build
+```
+
+**Network channels are optional**: a client-only install joins any server and still shows
+everything except furnace progress; installing the same jar on the server adds real-time
+furnace sync. The internal mod id is still `blockinfo` (its original name). Licensed under the Apache License 2.0 — see [LICENSE](LICENSE).

@@ -1,0 +1,9 @@
+{
+  "blockinfo.hud.input": "输入: %s x%s",
+  "blockinfo.hud.fuel": "燃料: %s x%s",
+  "blockinfo.hud.output": "输出: %s x%s",
+  "blockinfo.hud.contents": "内容:",
+  "blockinfo.hud.cooking": "烧制:",
+  "blockinfo.hud.burning": "燃烧:",
+  "blockinfo.hud.mining": "挖掘:"
+}

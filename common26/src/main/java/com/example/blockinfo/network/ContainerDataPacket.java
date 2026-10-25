@@ -6,8 +6,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.ArrayList;
@@ -16,7 +14,7 @@ import java.util.List;
 /** 容器内容同步包（服务端 -> 客户端）。 */
 public class ContainerDataPacket implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<ContainerDataPacket> TYPE =
-            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(BlockInfo.MOD_ID, "container_data"));
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(BlockInfo.MOD_ID, "container_data"));
 
     public static final StreamCodec<FriendlyByteBuf, ContainerDataPacket> STREAM_CODEC = StreamCodec.of(
             (buf, packet) -> {
@@ -57,7 +55,7 @@ public class ContainerDataPacket implements CustomPacketPayload {
 
     public void handle(IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (FMLEnvironment.getDist() == Dist.CLIENT) {
+            if (com.example.blockinfo.compat.SideCompat.isClient()) {
                 com.example.blockinfo.client.ClientContainerCache.updateData(pos, itemNames, itemCounts);
             }
         });

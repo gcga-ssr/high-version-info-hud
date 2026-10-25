@@ -93,10 +93,10 @@ NeoForm Runtime 用自己的 JVM HTTP/2 客户端拉 `piston-data.mojang.com`，
 | `neo_version` | 编译基线，取该版本线**最低可用**发行版 |
 | `neo_version_range` | 渲染进 `neoforge.mods.toml`，`[最低版,)` 覆盖整条线 |
 | `java_version` | `21` 或 `25` |
-| `source_line` | `1.21` → `common/`；`26` → `common26/` |
+| `source_line` | `1.21` → `common/`；`1.21.11` → `common111/`；`26` → `common26/` |
 
 `build.gradle` 的 `subprojects` 块按 `source_line` 选择源码目录，并把
-`common/src/main/resources` 作为两条线共用的资源目录。
+`common/src/main/resources` 作为三条线共用的资源目录。
 
 ## 已知的版本差异（已处理）
 
@@ -104,9 +104,10 @@ NeoForm Runtime 用自己的 JVM HTTP/2 客户端拉 `piston-data.mojang.com`，
 | --- | --- | --- |
 | `BuiltInRegistries.ITEM.get(id)` 返回类型从 `Item` 变成 `Optional<Reference<Item>>` | 1.21.2 | 改为遍历注册表 + `getKey`，两条线通用 |
 | `ServerPlayer.serverLevel()` → `level()` | 1.21.6 | 统一写 `(ServerLevel) player.level()` |
-| `ResourceLocation` → `Identifier` | 26.x | `common26` 分支 |
+| `FMLEnvironment.dist` 字段 → `getDist()` 方法 | 1.21.9 | 反射探测（`compat/SideCompat`） |
+| `ResourceLocation` → `Identifier`，`ResourceKey.location()` → `identifier()` | 1.21.11 | `common111` 分支 |
 | `GuiGraphics` → `GuiGraphicsExtractor`，`drawString` → `text` | 26.x | `common26` 分支 |
-| `FMLEnvironment.dist` 字段 → `getDist()` 方法 | 26.x | `common26` 分支 |
+
 
 ## 辅助脚本
 

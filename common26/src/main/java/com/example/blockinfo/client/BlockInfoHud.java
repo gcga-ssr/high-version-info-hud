@@ -10,10 +10,10 @@ import java.util.List;
 /**
  * HUD 的排版与绘制。
  *
- * <p>这里刻意只使用 {@link GuiGraphics#fill(int, int, int, int, int)} 与
- * {@link GuiGraphics#drawString(Font, String, int, int, int)} —— 这两个接口在整条
+ * <p>这里刻意只使用 {@link GuiGraphicsExtractor#fill(int, int, int, int, int)} 与
+ * {@link GuiGraphicsExtractor#drawString(Font, String, int, int, int)} —— 这两个接口在整条
  * Minecraft 1.21.x 线上都稳定。原先用的
- * {@code RenderSystem.setShaderTexture/setShaderColor} + {@code GuiGraphics.blit}
+ * {@code RenderSystem.setShaderTexture/setShaderColor} + {@code GuiGraphicsExtractor.blit}
  * 从 1.21.2 起经历了多轮重写（blit 签名变化、贴图绑定方式变化），是跨版本编译时
  * 最大的障碍；进度条改成纯色填充后就不再依赖它们了。
  */
@@ -36,7 +36,7 @@ public final class BlockInfoHud {
     private BlockInfoHud() {
     }
 
-    public static void render(GuiGraphics gui, Font font, int screenWidth, BlockInfoData data) {
+    public static void render(GuiGraphicsExtractor gui, Font font, int screenWidth, BlockInfoData data) {
         if (data.isFurnace) {
             float cookProgress = 0f;
             if (data.furnaceTotalCookTime > 0) {
@@ -203,7 +203,7 @@ public final class BlockInfoHud {
         }
     }
 
-    private static int drawLabelledBar(GuiGraphics gui, Font font, int x, int y,
+    private static int drawLabelledBar(GuiGraphicsExtractor gui, Font font, int x, int y,
                                        String label, float progress, int color) {
         gui.text(font, label, x, y, color);
         int barX = x + font.width(label) + 6;
@@ -213,7 +213,7 @@ public final class BlockInfoHud {
         return y + BAR_HEIGHT + 6;
     }
 
-    private static void drawBar(GuiGraphics gui, int x, int y, float progress, int color) {
+    private static void drawBar(GuiGraphicsExtractor gui, int x, int y, float progress, int color) {
         gui.fill(x, y, x + BAR_WIDTH, y + BAR_HEIGHT, 0xFF000000);
         gui.fill(x + 1, y + 1, x + BAR_WIDTH - 1, y + BAR_HEIGHT - 1, 0xFF303030);
 
