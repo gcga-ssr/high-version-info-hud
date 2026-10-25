@@ -6,8 +6,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /** 熔炉状态同步包（服务端 -> 客户端）。 */
@@ -81,7 +79,7 @@ public class FurnaceDataPacket implements CustomPacketPayload {
         context.enqueueWork(() -> {
             // 只有客户端会收到 playToClient 的包；这里的 dist 判断是为了让
             // 专用服务器永远不会去解析 ClientFurnaceCache 这个客户端类。
-            if (FMLEnvironment.getDist() == Dist.CLIENT) {
+            if (com.example.blockinfo.compat.SideCompat.isClient()) {
                 com.example.blockinfo.client.ClientFurnaceCache.updateData(
                         pos, cookTime, cookTotal, burnTime, burnTotal,
                         inputCount, inputName, fuelCount, fuelName, outputCount, outputName
