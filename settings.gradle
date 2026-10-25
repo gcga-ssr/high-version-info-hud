@@ -1,0 +1,27 @@
+rootProject.name = 'blockinfo'
+
+// 每个 Minecraft 发行版一个子工程（1.21.1 ~ 26.3），各自针对该版本线的最低可用 NeoForge 编译。
+def mcVersions = [
+        '1.21.1',
+        '1.21.2',
+        '1.21.3',
+        '1.21.4',
+        '1.21.5',
+        '1.21.6',
+        '1.21.7',
+        '1.21.8',
+        '1.21.9',
+        '1.21.10',
+        '1.21.11',
+        '26.1',
+        '26.1.1',
+        '26.1.2',
+        '26.2',
+        '26.3',
+]
+
+mcVersions.each { v ->
+    def name = 'mc' + v.replace('.', '_')
+    include name
+    project(":$name").projectDir = file("versions/$v")
+}
