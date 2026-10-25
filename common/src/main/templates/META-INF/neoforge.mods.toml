@@ -1,0 +1,34 @@
+# NeoForge Mod Metadata File
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+description='''
+Unified client + server component for Block Info.
+
+Displays real-time block information at the top of the screen: block name,
+whether it is from a mod, plant growth, container contents, furnace smelting
+progress and block breaking progress.
+
+The server side only adds furnace/container synchronisation. Both network
+channels are registered as optional, so the mod works on either side alone:
+clients can join servers without it, and servers accept clients without it.
+'''
+
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="${neo_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
