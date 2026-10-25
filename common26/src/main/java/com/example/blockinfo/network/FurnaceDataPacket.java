@@ -11,7 +11,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 /** 熔炉状态同步包（服务端 -> 客户端）。 */
 public class FurnaceDataPacket implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<FurnaceDataPacket> TYPE =
-            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(BlockInfo.MOD_ID, "furnace_data"));
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(BlockInfo.MOD_ID, "furnace_data"));
 
     public static final StreamCodec<FriendlyByteBuf, FurnaceDataPacket> STREAM_CODEC = StreamCodec.of(
             (buf, packet) -> {

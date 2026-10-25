@@ -31,7 +31,7 @@ subprojects { sub ->
     //   26   -> common26/src/main/java  （26.x 改名后的 API：Identifier / GuiGraphicsExtractor ...）
     // 语言文件等资源两条线共用，放在 common/src/main/resources。
     def sourceLine = (sub.findProperty('source_line') ?: '1.21').toString()
-    def javaRoot = sourceLine == '26' ? 'common26' : 'common'
+    def javaRoot = sourceLine == '26' ? 'common26' : (sourceLine == '1.21.11' ? 'common111' : 'common')
     sourceSets.main.java.srcDir rootProject.file("${javaRoot}/src/main/java")
     sourceSets.main.resources.srcDir rootProject.file('common/src/main/resources')
 

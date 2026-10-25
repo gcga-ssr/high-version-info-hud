@@ -14,7 +14,7 @@ import java.util.List;
 /** 容器内容同步包（服务端 -> 客户端）。 */
 public class ContainerDataPacket implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<ContainerDataPacket> TYPE =
-            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(BlockInfo.MOD_ID, "container_data"));
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(BlockInfo.MOD_ID, "container_data"));
 
     public static final StreamCodec<FriendlyByteBuf, ContainerDataPacket> STREAM_CODEC = StreamCodec.of(
             (buf, packet) -> {

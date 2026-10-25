@@ -116,16 +116,17 @@ HUD 文案走原版语言文件：
 ## 目录结构
 
 ```
-common/src/main/java/          1.21.x 版本线的源码（NeoForge 21.x API）
-common26/src/main/java/        26.x 版本线的源码（改名后的 API）
-common/src/main/resources/     两条线共用资源：语言文件
+common/src/main/java/          1.21.1 ~ 1.21.10 的源码
+common111/src/main/java/       1.21.11 的源码（ResourceLocation 已改名 Identifier）
+common26/src/main/java/        26.x 的源码（Identifier + GuiGraphicsExtractor）
+common/src/main/resources/     三条线共用资源：语言文件
 common/src/main/templates/     neoforge.mods.toml 模板
 versions/<MC版本>/             每个版本一行配置
 build.gradle                   子工程公共构建配置
 settings.gradle                版本列表
 ```
 
-`common` 与 `common26` 的区别只在 26.x 的几处改名（见下），其余逻辑完全一致。
+三份源码只有下表那几处改名的差异，其余逻辑完全一致。
 源码就是全部内容 —— 想改、想重编译都可以直接拿去用。
 
 ## 实现要点
@@ -151,9 +152,9 @@ settings.gradle                版本列表
 | --- | --- | --- |
 | `BuiltInRegistries.ITEM.get(id)` 返回 `Optional<Reference<Item>>` | 1.21.2 | 改为遍历注册表 + `getKey` |
 | `ServerPlayer.serverLevel()` → `level()` | 1.21.6 | 统一写 `(ServerLevel) player.level()` |
-| `ResourceLocation` → `Identifier` | 26.x | `common26` 分支 |
+| `FMLEnvironment.dist` 字段 → `getDist()` 方法 | 1.21.9 | 反射探测（`compat/SideCompat`），两条线通用 |
+| `ResourceLocation` → `Identifier`，`ResourceKey.location()` → `identifier()` | 1.21.11 | `common111` 分支 |
 | `GuiGraphics` → `GuiGraphicsExtractor`，`drawString` → `text` | 26.x | `common26` 分支 |
-| `FMLEnvironment.dist` 字段 → `getDist()` 方法 | 26.x | `common26` 分支 |
 
 ## 许可证
 
